@@ -15,6 +15,9 @@ Amaç, küçük ama odaklı örnekler üzerinden Spring AI kavramlarını adım 
 - Maven
 - Spring Web MVC
 - Project Reactor
+- `ChatMemory` ile konuşma hafızası
+- `conversationId` ile konuşmaların birbirinden ayrılması
+- `MessageChatMemoryAdvisor` kullanımı
 
 ## Bu Repo Şu Ana Kadar Neleri Kapsıyor?
 
@@ -46,8 +49,10 @@ Workshop ilerledikçe repo genişletilmeye devam edecektir.
     │   ├── Itinerary.java
     │   └── VacationPlanController.java
     └── multimodal
-        ├── ImageDetectionController.java
-        └── ImageGenerationController.java
+    │   ├── ImageDetectionController.java
+    │   └── ImageGenerationController.java
+    └── memory
+        └── MemoryController.java
 
 ## Konfigürasyon
 
@@ -123,6 +128,18 @@ Ayrı bir örnekte Spring AI’nin `ImageModel` abstraction’ı kullanılarak G
 
 Bu bölüm, görsel üretimin de Spring Boot uygulamasına benzer bir Spring AI yaklaşımıyla entegre edilebildiğini göstermektedir.
 
+### 6. Chat Memory
+
+Projede Spring AI'nin `ChatMemory` abstraction'ı ve `MessageChatMemoryAdvisor` kullanılarak konuşma hafızası örneği bulunmaktadır.
+
+Her konuşma bir `conversationId` ile ayrılır. Böylece farklı konuşmalar kendi geçmişlerini ve bağlamlarını birbirinden bağımsız şekilde koruyabilir.
+
+Spring AI 2.x ile birlikte memory advisor kullanılan her istekte conversation ID açıkça verilmek zorundadır.
+
+Workshop'taki mevcut örnek Spring AI'nin varsayılan in-memory yapısını kullanmaktadır. Bu nedenle uygulama yeniden başlatıldığında konuşma hafızası kaybolur.
+
+İlerleyen aşamalarda kalıcı memory çözümleri ve gerçek uygulamalardaki conversation yönetimi incelenebilir.
+
 ## Örnek Endpointler
 
 Repository içinde şu an yer alan bazı örnek endpointler:
@@ -141,7 +158,6 @@ Repository içinde şu an yer alan bazı örnek endpointler:
 
 Bir sonraki aşamalarda repoya eklenmesi planlanan başlıklar:
 
-- Chat memory
 - Embeddings
 - Vector store
 - Retrieval-Augmented Generation (RAG)

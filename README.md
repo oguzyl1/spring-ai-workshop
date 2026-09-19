@@ -30,6 +30,9 @@ So far, this repository includes examples for:
 - Schema validation
 - Multimodal input (image-to-text)
 - Image generation with Gemini image models
+- Conversation memory with `ChatMemory`
+- Conversation isolation using `conversationId`
+- `MessageChatMemoryAdvisor`
 
 The repository will continue to grow as more topics are studied.
 
@@ -45,9 +48,11 @@ The repository will continue to grow as more topics are studied.
     │   ├── Activity.java
     │   ├── Itinerary.java
     │   └── VacationPlanController.java
-    └── multimodal
-        ├── ImageDetectionController.java
-        └── ImageGenerationController.java
+    ├── multimodal
+    │   ├── ImageDetectionController.java
+    │   └── ImageGenerationController.java
+    └── memory
+        └── MemoryController.java
 
 ## Configuration
 
@@ -123,6 +128,18 @@ A separate image generation example uses Spring AI's `ImageModel` abstraction wi
 
 This shows how text-to-image generation can be integrated into a Spring Boot application using the same overall Spring AI style.
 
+### 6. Chat Memory
+
+The project includes a conversational memory example using Spring AI's `ChatMemory` abstraction together with `MessageChatMemoryAdvisor`.
+
+Each conversation is scoped by a `conversationId`, allowing multiple independent conversations to maintain their own context.
+
+Spring AI 2.x requires the conversation ID to be explicitly provided for every request that uses a memory advisor.
+
+The current workshop example uses Spring AI's default in-memory implementation, so conversation context is lost when the application restarts.
+
+Future examples may explore persistent memory implementations and more production-oriented conversation management.
+
 ## Example Endpoints
 
 Some example endpoints currently included in the repository:
@@ -141,7 +158,6 @@ Some example endpoints currently included in the repository:
 
 The next areas planned for this repository include:
 
-- Chat memory
 - Embeddings
 - Vector stores
 - Retrieval-Augmented Generation (RAG)
