@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: spring-ai-workshop
+
+  ai:
+    google:
+      genai:
+        api-key: ${GOOGLE_GENAI_API_KEY}
+        chat:
+          model: gemini-3.6-flash
