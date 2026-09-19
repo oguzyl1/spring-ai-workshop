@@ -14,12 +14,20 @@ public class ChatController {
     private final ChatClient chatClient;
 
     public ChatController(ChatClient.Builder builder) {
+        /*
+         * Spring Boot, yapılandırılmış ChatModel üzerinden bir ChatClient.Builder bean'i oluşturur.
+         * Builder kullanarak provider/model ayarları uygulanmış ChatClient instance'ını elde ederiz.
+         */
         this.chatClient = builder.build();
     }
 
 
     @GetMapping("/chat")
     public String chat() {
+        /*
+         * call() senkron çağrı modelini seçer.
+         * content() ise model cevabından yalnızca üretilen metni döndürür.
+         */
         return chatClient.prompt()
                 .user("Bana java hakkında ilginç bir gerçek söyle")
                 .call()
@@ -30,6 +38,11 @@ public class ChatController {
 
     @GetMapping(value = "/stream")
     public Flux<String> stream() {
+        /*
+         * stream() cevabı tek seferde beklemek yerine Flux<String> olarak parça parça döndürür.
+         * delayElements() yalnızca streaming davranışını gözle görmek için eklenmiştir;
+         * gerçek uygulamada yapay gecikme eklemek genellikle istenmez.
+         */
         return chatClient.prompt()
                 .user("""
                         Yakın zamanda İstanbul'daki işim için taşınmam gerekecek.
@@ -43,8 +56,13 @@ public class ChatController {
 
     @GetMapping("/joke")
     public ChatResponse joke(){
+        /*
+         * content() yerine chatResponse() kullandığımızda yalnızca metni değil,
+         * generation ve token kullanımı gibi ek metadata içeren tam ChatResponse nesnesini alırız.
+         */
         return chatClient
-                .prompt("bana köpeklerle alakalı bir şaka yap")
+                .prompt()
+                .user("bana köpeklerle alakalı bir şaka yap")
                 .call()
                 .chatResponse();
     }
