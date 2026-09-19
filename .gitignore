@@ -36,3 +36,4 @@ build/
 .env.*
 application-local.yml
 application-local.yaml
+src/main/resources/images/image1.jpg
