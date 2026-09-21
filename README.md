@@ -42,6 +42,11 @@ So far, this repository includes examples for:
 - Semantic retrieval with `QuestionAnswerAdvisor`
 - Basic Retrieval-Augmented Generation (RAG)
 - RAG combined with structured output
+- Tool calling with `@Tool`
+- Tool parameter descriptions with `@ToolParam`
+- Utility tools for real-time data
+- Action tools that modify application state
+- External API integration through tools
 
 The repository will continue to grow as more topics are studied.
 
@@ -64,11 +69,21 @@ The repository will continue to grow as more topics are studied.
     │   └── MemoryController.java
     ├── byod
     │   └── ModelComparison.java
-    └── rag
-        ├── Model.java
-        ├── Models.java
-        ├── ModelsController.java
-        └── RagConfiguration.java
+    ├── rag
+    │    ├── Model.java
+    │    ├── Models.java
+    │    ├── ModelsController.java
+    │    └── RagConfiguration.java
+    ├── tools
+    │   ├── datetime
+    │   │   ├── DateTimeController.java
+    │   │   └── DateTimeTools.java
+    │   ├── action
+    │   │   ├── TaskManagementController.java
+    │   │   └── TaskManagementTools.java
+    │   └── weather
+            ├── WeatherController.java
+            └── WeatherTools.java
 
 ## Configuration
 
@@ -189,6 +204,22 @@ The example uses `QuestionAnswerAdvisor` to handle the retrieval and prompt augm
 
 `SimpleVectorStore` is used only for learning and local experimentation. A production application would normally use a persistent vector database such as PGVector, Qdrant, Elasticsearch, or another supported vector store.
 
+### 9. Tool Calling
+
+The project includes examples of Spring AI tool calling using `@Tool` and `@ToolParam`.
+
+Tools allow the model to do more than generate text. Based on the user's natural-language request, the model can decide when an application function should be invoked and which arguments should be supplied.
+
+The current examples demonstrate three common tool categories:
+
+- **Utility tools:** retrieving the current date and time when the model requires real-time information.
+- **Action tools:** creating, updating, and assigning tasks, demonstrating how an AI assistant can trigger application-side operations.
+- **Information retrieval tools:** calling an external weather API to retrieve live forecasts and active weather alerts.
+
+Spring AI exposes these Java methods to the model through `ChatClient`. The model selects the appropriate tool, Spring AI executes the corresponding Java method, and the tool result is returned to the model so it can generate the final response.
+
+The examples intentionally use simple in-memory state and public APIs. In a real application, tools could invoke service-layer methods, databases, other microservices, or external APIs.
+
 
 ## Example Endpoints
 
@@ -206,12 +237,14 @@ Some example endpoints currently included in the repository:
 - `/rag/models`
 - `/models`
 - `/models/stuff-the-prompt`
+- `/tools`
+- `/tasks`
+- `/weather`
 
 ## Planned Topics
 
 The next areas planned for this repository include:
 
-- Tool calling
 - MCP
 - Observability
 - Evaluation and testing

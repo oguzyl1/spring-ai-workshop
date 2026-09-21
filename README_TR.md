@@ -42,6 +42,11 @@ Amaç, küçük ama odaklı örnekler üzerinden Spring AI kavramlarını adım 
 - `QuestionAnswerAdvisor` ile semantic retrieval
 - Temel Retrieval-Augmented Generation (RAG)
 - RAG ile structured output'un birlikte kullanımı
+- `@Tool` ile tool calling
+- `@ToolParam` ile tool parametrelerinin açıklanması
+- Gerçek zamanlı bilgi sağlayan utility tool'lar
+- Uygulama state'ini değiştiren action tool'lar
+- Tool üzerinden harici API entegrasyonu
 
 Workshop ilerledikçe repo genişletilmeye devam edecektir.
 
@@ -64,11 +69,21 @@ Workshop ilerledikçe repo genişletilmeye devam edecektir.
     │   └── MemoryController.java
     ├── byod
     │   └── ModelComparison.java
-    └── rag
-        ├── Model.java
-        ├── Models.java
-        ├── ModelsController.java
-        └── RagConfiguration.java
+    ├── rag
+    │    ├── Model.java
+    │    ├── Models.java
+    │    ├── ModelsController.java
+    │    └── RagConfiguration.java
+    ├── tools
+    │   ├── datetime
+    │   │   ├── DateTimeController.java
+    │   │   └── DateTimeTools.java
+    │   ├── action
+    │   │   ├── TaskManagementController.java
+    │   │   └── TaskManagementTools.java
+    │   └── weather
+            ├── WeatherController.java
+            └── WeatherTools.java
 
 ## Konfigürasyon
 
@@ -189,6 +204,21 @@ Kullanıcı bir soru gönderdiğinde Spring AI:
 
 `SimpleVectorStore` yalnızca öğrenme ve yerel denemeler için kullanılmaktadır. Gerçek uygulamalarda genellikle PGVector, Qdrant, Elasticsearch veya başka bir kalıcı vector database tercih edilir.
 
+### 9. Tool Calling
+
+Projede Spring AI'nin `@Tool` ve `@ToolParam` yapıları kullanılarak tool calling örnekleri bulunmaktadır.
+
+Tool calling sayesinde model yalnızca metin üretmekle kalmaz; kullanıcının doğal dilde verdiği isteğe göre uygulama içerisindeki bir fonksiyonun çağrılması gerektiğine ve bu fonksiyona hangi parametrelerin gönderileceğine karar verebilir.
+
+Mevcut örneklerde üç farklı tool kullanım türü gösterilmektedir:
+
+- **Utility tool:** Modelin gerçek zamanlı bilgiye ihtiyaç duyduğunda güncel tarih ve saat bilgisini alması.
+- **Action tool:** Görev oluşturma, durum güncelleme ve görevi başka bir kişiye atama gibi uygulama durumunu değiştiren işlemler.
+- **Information retrieval tool:** Harici bir hava durumu API'sinden güncel tahmin ve aktif hava uyarılarının alınması.
+
+Spring AI, Java metotlarını `ChatClient` üzerinden modele kullanılabilir tool'lar olarak sunar. Model uygun tool'u seçer, Spring AI ilgili Java metodunu çalıştırır ve elde edilen sonuç tekrar modele verilerek kullanıcıya doğal dilde son cevap oluşturulur.
+
+Workshop örneklerinde state basit şekilde memory içerisinde tutulmakta ve public API'ler kullanılmaktadır. Gerçek uygulamalarda tool'lar service katmanını, veritabanlarını, diğer mikroservisleri veya harici API'leri çağırabilir.
 
 ## Örnek Endpointler
 
@@ -206,12 +236,14 @@ Repository içinde şu an yer alan bazı örnek endpointler:
 - `/rag/models`
 - `/models`
 - `/models/stuff-the-prompt`
+- `/tools`
+- `/tasks`
+- `/weather`
 
 ## Planlanan Sonraki Konular
 
 Bir sonraki aşamalarda repoya eklenmesi planlanan başlıklar:
 
-- Tool calling
 - MCP
 - Observability
 - Evaluation ve testing
