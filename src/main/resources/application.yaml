@@ -6,6 +6,7 @@ spring:
     google:
       genai:
         api-key: ${GOOGLE_GENAI_API_KEY}
+
         chat:
           model: gemini-3.6-flash
 
@@ -13,3 +14,8 @@ spring:
           model: gemini-3.1-flash-image
           aspect-ratio: 1:1
           image-size: 1K
+
+        embedding:
+          api-key: ${GOOGLE_GENAI_API_KEY}
+          text:
+            model: gemini-embedding-2

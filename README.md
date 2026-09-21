@@ -33,6 +33,15 @@ So far, this repository includes examples for:
 - Conversation memory with `ChatMemory`
 - Conversation isolation using `conversationId`
 - `MessageChatMemoryAdvisor`
+- Using model knowledge without external context
+- Supplying external data through system prompts
+- "Stuff the prompt" / Bring Your Own Data pattern
+- Text embeddings with Google GenAI
+- Document chunking with `TokenTextSplitter`
+- Local vector storage with `SimpleVectorStore`
+- Semantic retrieval with `QuestionAnswerAdvisor`
+- Basic Retrieval-Augmented Generation (RAG)
+- RAG combined with structured output
 
 The repository will continue to grow as more topics are studied.
 
@@ -51,8 +60,15 @@ The repository will continue to grow as more topics are studied.
     ├── multimodal
     │   ├── ImageDetectionController.java
     │   └── ImageGenerationController.java
-    └── memory
-        └── MemoryController.java
+    ├── memory
+    │   └── MemoryController.java
+    ├── byod
+    │   └── ModelComparison.java
+    └── rag
+        ├── Model.java
+        ├── Models.java
+        ├── ModelsController.java
+        └── RagConfiguration.java
 
 ## Configuration
 
@@ -80,6 +96,11 @@ Example `application.yaml`:
               model: gemini-3.1-flash-image
               aspect-ratio: 1:1
               image-size: 1K
+            
+            embedding:
+              api-key: ${GOOGLE_GENAI_API_KEY}
+              text:
+                model: gemini-embedding-2
 
 ## Important Notes
 
@@ -140,6 +161,35 @@ The current workshop example uses Spring AI's default in-memory implementation, 
 
 Future examples may explore persistent memory implementations and more production-oriented conversation management.
 
+### 7. Bringing External Data into the Prompt
+
+The project demonstrates the difference between relying only on the model's built-in knowledge and providing external data at request time.
+
+The first example sends only a user prompt, so the model answers using its existing knowledge.
+
+The second example uses a "stuff the prompt" approach by placing a dataset directly inside the system prompt. This allows the model to use application-provided information without retraining.
+
+This approach works well for small datasets, but it does not scale efficiently when the amount of data grows. It serves as a simple introduction to the idea behind Retrieval-Augmented Generation (RAG), where only the most relevant pieces of external data are retrieved dynamically.
+
+### 8. Retrieval-Augmented Generation (RAG)
+
+The project includes a basic Retrieval-Augmented Generation example using Spring AI.
+
+A local JSON dataset containing language model information is loaded, split into smaller chunks, converted into embeddings, and stored in a `SimpleVectorStore`.
+
+When a user sends a question, Spring AI:
+
+1. Converts the question into an embedding.
+2. Searches the vector store for semantically similar document chunks.
+3. Adds the retrieved content to the model context.
+4. Sends the augmented prompt to Gemini.
+5. Maps the response into a structured Java type.
+
+The example uses `QuestionAnswerAdvisor` to handle the retrieval and prompt augmentation process automatically.
+
+`SimpleVectorStore` is used only for learning and local experimentation. A production application would normally use a persistent vector database such as PGVector, Qdrant, Elasticsearch, or another supported vector store.
+
+
 ## Example Endpoints
 
 Some example endpoints currently included in the repository:
@@ -153,14 +203,14 @@ Some example endpoints currently included in the repository:
 - `/vacation/structured`
 - `/image/detection/image-to-text`
 - `/image/generator/generate-image`
+- `/rag/models`
+- `/models`
+- `/models/stuff-the-prompt`
 
 ## Planned Topics
 
 The next areas planned for this repository include:
 
-- Embeddings
-- Vector stores
-- Retrieval-Augmented Generation (RAG)
 - Tool calling
 - MCP
 - Observability

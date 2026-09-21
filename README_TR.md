@@ -15,9 +15,6 @@ Amaç, küçük ama odaklı örnekler üzerinden Spring AI kavramlarını adım 
 - Maven
 - Spring Web MVC
 - Project Reactor
-- `ChatMemory` ile konuşma hafızası
-- `conversationId` ile konuşmaların birbirinden ayrılması
-- `MessageChatMemoryAdvisor` kullanımı
 
 ## Bu Repo Şu Ana Kadar Neleri Kapsıyor?
 
@@ -33,6 +30,18 @@ Amaç, küçük ama odaklı örnekler üzerinden Spring AI kavramlarını adım 
 - Schema validation
 - Multimodal input (image-to-text)
 - Gemini image modelleri ile image generation
+- `ChatMemory` ile konuşma hafızası
+- `conversationId` ile konuşmaların birbirinden ayrılması
+- `MessageChatMemoryAdvisor` kullanımı
+- Modelin kendi bilgisiyle cevap üretmesi
+- System prompt üzerinden harici context sağlanması
+- "Stuff the prompt" / Bring Your Own Data yaklaşımı
+- Google GenAI ile text embedding
+- `TokenTextSplitter` ile document chunking
+- `SimpleVectorStore` ile yerel vector storage
+- `QuestionAnswerAdvisor` ile semantic retrieval
+- Temel Retrieval-Augmented Generation (RAG)
+- RAG ile structured output'un birlikte kullanımı
 
 Workshop ilerledikçe repo genişletilmeye devam edecektir.
 
@@ -48,11 +57,18 @@ Workshop ilerledikçe repo genişletilmeye devam edecektir.
     │   ├── Activity.java
     │   ├── Itinerary.java
     │   └── VacationPlanController.java
-    └── multimodal
+    ├── multimodal
     │   ├── ImageDetectionController.java
     │   └── ImageGenerationController.java
-    └── memory
-        └── MemoryController.java
+    ├── memory
+    │   └── MemoryController.java
+    ├── byod
+    │   └── ModelComparison.java
+    └── rag
+        ├── Model.java
+        ├── Models.java
+        ├── ModelsController.java
+        └── RagConfiguration.java
 
 ## Konfigürasyon
 
@@ -80,6 +96,11 @@ API key environment variable üzerinden verilir:
               model: gemini-3.1-flash-image
               aspect-ratio: 1:1
               image-size: 1K
+            
+            embedding:
+              api-key: ${GOOGLE_GENAI_API_KEY}
+              text:
+                model: gemini-embedding-2
 
 ## Önemli Notlar
 
@@ -140,6 +161,35 @@ Workshop'taki mevcut örnek Spring AI'nin varsayılan in-memory yapısını kull
 
 İlerleyen aşamalarda kalıcı memory çözümleri ve gerçek uygulamalardaki conversation yönetimi incelenebilir.
 
+### 7. Harici Veriyi Prompt'a Dahil Etme
+
+Projede modelin yalnızca kendi eğitim bilgisini kullanması ile çalışma anında harici veri sağlanması arasındaki fark gösterilmektedir.
+
+İlk örnekte modele yalnızca kullanıcı sorusu gönderilir ve model mevcut bilgisine dayanarak cevap üretir.
+
+İkinci örnekte ise "stuff the prompt" yaklaşımı kullanılarak uygulamanın sahip olduğu veri doğrudan system prompt içerisine eklenir. Böylece modeli yeniden eğitmeden, çalışma anında ek bilgi sağlanabilir.
+
+Bu yöntem küçük veri kümelerinde kullanışlıdır ancak veri miktarı büyüdükçe tüm içeriği her istekte prompt'a eklemek verimsiz hale gelir. Bu örnek, daha sonra kullanılan Retrieval-Augmented Generation (RAG) yaklaşımına geçişi göstermektedir.
+
+### 8. Retrieval-Augmented Generation (RAG)
+
+Projede Spring AI kullanılarak temel bir Retrieval-Augmented Generation örneği bulunmaktadır.
+
+Dil modellerine ait bilgileri içeren yerel bir JSON dosyası okunur, daha küçük parçalara ayrılır, embedding'lere dönüştürülür ve `SimpleVectorStore` içerisinde saklanır.
+
+Kullanıcı bir soru gönderdiğinde Spring AI:
+
+1. Kullanıcı sorusunu embedding'e dönüştürür.
+2. Vector store içerisinde anlamsal olarak benzer document chunk'larını arar.
+3. Bulunan içerikleri model context'ine ekler.
+4. Zenginleştirilmiş prompt'u Gemini modeline gönderir.
+5. Model cevabını yapılandırılmış bir Java tipine dönüştürür.
+
+Örnekte retrieval ve prompt augmentation işlemlerini otomatik olarak gerçekleştirmek için `QuestionAnswerAdvisor` kullanılmaktadır.
+
+`SimpleVectorStore` yalnızca öğrenme ve yerel denemeler için kullanılmaktadır. Gerçek uygulamalarda genellikle PGVector, Qdrant, Elasticsearch veya başka bir kalıcı vector database tercih edilir.
+
+
 ## Örnek Endpointler
 
 Repository içinde şu an yer alan bazı örnek endpointler:
@@ -153,14 +203,14 @@ Repository içinde şu an yer alan bazı örnek endpointler:
 - `/vacation/structured`
 - `/image/detection/image-to-text`
 - `/image/generator/generate-image`
+- `/rag/models`
+- `/models`
+- `/models/stuff-the-prompt`
 
 ## Planlanan Sonraki Konular
 
 Bir sonraki aşamalarda repoya eklenmesi planlanan başlıklar:
 
-- Embeddings
-- Vector store
-- Retrieval-Augmented Generation (RAG)
 - Tool calling
 - MCP
 - Observability
